@@ -5,75 +5,35 @@ from tkinter import ttk
 from functools import partial
 from tkcalendar import Calendar, DateEntry
 
-from datetime import datetime
 
-
-class Paciente(tk.Frame):
+class CadastrarAmostra(tk.Frame):
     def __init__(self, parent, controller):
         self.controller = controller
         tk.Frame.__init__(self, parent)
-
-        back_button = ttk.Button(self, text="Voltar",
-                                 command=self.exit)
-        back_button.pack(side=tk.LEFT, padx=5)
-
-        refresh_button = ttk.Button(self, text="Atualizar",
-                                    command=self.initUI)
-        refresh_button.pack(side=tk.LEFT, padx=5)
-
-    def initUI(self):
-        
-        result = self.controller.send_query('SELECT',
-                                                   'Paciente',
-                                                   '*'
-                                                   )
-        
-
-        for row in result[2]:
-            print(row)
-            button_name = row['idPaciente']
-            button = ttk.Button(self, text=button_name)
-            button.pack()
-           
-        #  self.controller.after(1000, self.initUI)
-
-
-    def exit(self):
-        self.controller.show_frame(self.controller.get_startpage())
-
-
-class CadastrarPaciente(tk.Frame):
-    def __init__(self, parent, controller):
-        self.controller = controller
-        tk.Frame.__init__(self, parent)
-        self.table_name = 'Paciente'
+        self.table_name = 'Amostra'
         self.fields = {
-            'HospitalOrigem':   {'label': 'Hospital de Origem',
+            'idPaciente':   {'label': 'Paciente',
+                             'entry': ttk.Combobox,
+                             'value': ['1']},
+            'idColeta': {'label': 'Coleta',
+                         'entry': ttk.Combobox,
+                         'value': ['1']},
+            'DataExtracao':     {'label': 'Data de Extração (dd/mm/aaaa)',
+                                'entry': DateEntry},
+            'Caixa':            {'label': 'Caixa',
                                  'entry': ttk.Entry},
-            'ProntuarioOrigem': {'label': 'Prontuario de Origem',
+            'PosicaoCaixa':     {'label': 'Posicao da caixa',
+                                'entry': ttk.Entry},
+            'Freezer':          {'label': 'Freezer',
                                  'entry': ttk.Entry},
-            'Sexo':             {'label': 'Sexo',
-                                 'entry': ttk.Radiobutton,
-                                 'value': [('Feminino', 'feminino'),
-                                           ('Masculino', 'masculino')]},
-            'DataNascimento':   {'label': 'Data de Nascimento (dd/mm/aaaa)',
+            'ConcentracaoNanovue':          {'label': 'Concentração aferida no nanovue',
+                                             'entry': ttk.Entry},
+            'DataNanovue':      {'label': 'Data de medida da concentração de nanovue',
                                  'entry': DateEntry},
-            'Pais':             {'label': 'Pais',
+            'ConcentracaoQubit':{'label': 'Concentração aferida no qubit',
                                  'entry': ttk.Entry},
-            'Estado':           {'label': 'Estado',
-                                 'entry': ttk.Entry},
-            'Municipio':        {'label': 'Municipio',
-                                 'entry': ttk.Entry},
-            'TipoAtendimento':  {'label': 'Tipo de Atendimento',
-                                 'entry': ttk.Entry},
-            'TipoParto':        {'label': 'Tipo de Parto',
-                                 'entry': ttk.Entry},
-            'Lactante':         {'label': 'Lactante',
-                                 'entry': ttk.Radiobutton,
-                                 'value': [('Sim', 1),
-                                           ('Não', 2)]},
-            'Etnia':            {'label': 'Etnia',
-                                 'entry': ttk.Entry}
+            'DataQubit':        {'label': 'Data de medida da concentração de qubit',
+                                 'entry': DateEntry},
         }
         ents = self.make_form()
         # Send Query button

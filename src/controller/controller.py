@@ -8,6 +8,7 @@ from tkinter import ttk
 from model.model import Model
 from view.view import *
 from view.paciente import *
+from view.amostra import *
 
 
 class Controller(tk.Tk):
@@ -23,7 +24,7 @@ class Controller(tk.Tk):
 
         self.frames = {}
 
-        for F in (StartPage, Paciente, CadastrarPaciente):
+        for F in (StartPage, CadastrarPaciente, CadastrarAmostra):
             page_name = F.__name__
             frame = F(container, self)
             self.frames[page_name] = frame
@@ -41,21 +42,32 @@ class Controller(tk.Tk):
         self.mainloop()
 
     def show_frame(self, page_name):
-        #  for frame in self.frames.values():
-        #      frame.grid_remove()
+        for frame in self.frames.values():
+            frame.grid_remove()
         frame = self.frames[page_name]
-        frame.tkraise()
+        frame.grid()
+        #  frame.tkraise()
 
     def get_startpage(self):
         return self.start_page
 
-    def send_query(self, table, columns, query_values):
-        message = 'INSERT into `' + table + '` ' + str(columns) + ' VALUES '
-        nr_values = tuple(['%s' for s in query_values])
-        message = message + str(nr_values)
-        message = message.replace("'", "")
+    def send_query(self, command, table, columns, query_values=None):
+        if command == 'INSERT':
+            message = 'INSERT into `' + table + '` ' + str(columns) + ' VALUES '
+            nr_values = tuple(['%s' for s in query_values])
+            message = message + str(nr_values)
+            message = message.replace("'", "")
+            return_value = self.model.insert(message, query_values)
 
-        return self.model.insert(message, query_values)
+        if command == 'SELECT':
+            if query_values:
+                print('put WHERE statment here')
+            message = 'SELECT ' + str(columns) + ' FROM ' + table
+            #  message = message.replace("'", "")
+            return_value = self.model.select(message)
+
+        return return_value
+
 
     def handler(self, error_type, code, message):
         if error_type == 1:

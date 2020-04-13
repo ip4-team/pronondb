@@ -13,11 +13,13 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text="Start Page", font=('Verdana', 12))
         label.pack(side='top', fill=tk.X, pady=10)
 
-        button = tk.Button(self, text="Pacientes ",
-                           command=lambda: controller.show_frame('Paciente'))
-        button.pack()
-        button.focus_set()
+        #  button.focus_set()
 
         button2 = tk.Button(self, text="Cadastrar Paciente",
                             command=lambda: controller.show_frame('CadastrarPaciente'))
         button2.pack()
+
+
+        button = tk.Button(self, text="Cadastrar Amostra",
+                           command=lambda: controller.show_frame('CadastrarAmostra'))
+        button.pack()
