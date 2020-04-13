@@ -10,13 +10,14 @@ from .paciente import *
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Start Page", font=("Verdana", 12))
-        label.pack(pady=10, padx=10)
+        label = tk.Label(self, text="Start Page", font=('Verdana', 12))
+        label.pack(side='top', fill=tk.X, pady=10)
 
         button = tk.Button(self, text="Pacientes ",
-                           command=lambda: controller.show_frame(Paciente))
+                           command=lambda: controller.show_frame('Paciente'))
         button.pack()
+        button.focus_set()
 
         button2 = tk.Button(self, text="Cadastrar Paciente",
-                            command=lambda: controller.show_frame(CadastrarPaciente))
+                            command=lambda: controller.show_frame('CadastrarPaciente'))
         button2.pack()
