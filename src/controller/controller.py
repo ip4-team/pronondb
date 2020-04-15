@@ -3,12 +3,11 @@ import datetime
 
 import tkinter as tk
 from tkinter import ttk
-#  import tkinter. as messagebox
 
 from model.model import Model
 from view.view import *
-from view.paciente import *
-from view.amostra import *
+#  from view.paciente import *
+#  from view.amostra import *
 
 
 class Controller(tk.Tk):
@@ -16,22 +15,22 @@ class Controller(tk.Tk):
         self.model = model
 
         tk.Tk.__init__(self)
-        container = tk.Frame(self)
+        self.container = tk.Frame(self)
 
-        container.pack(side='top', fill='both', expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        self.container.pack(side='top', fill='both', expand=True)
+        #  self.statusbar = Statusbar(container, self)
+        self.toolbar = Toolbar(self.container, self)
+        self.navbar = Navbar(self.container, self)
+        self.main = Main(self.container, self)
 
-        self.frames = {}
+        #  self.statusbar.pack(side='bottom', fill='x')
+        self.toolbar.pack(side='top', fill='x')
+        self.navbar.pack(side='left', fill='y')
 
-        for F in (StartPage, CadastrarPaciente, CadastrarAmostra):
-            page_name = F.__name__
-            frame = F(container, self)
-            self.frames[page_name] = frame
-            frame.grid(row=0, column=0, sticky='nsew')
+        self.main.pack(side='right', fill='both', expand=True)
+        self.main.grid_rowconfigure(0, weight=1)
+        self.main.grid_columnconfigure(0, weight=1)
 
-        self.start_page = 'StartPage'
-        self.show_frame('StartPage')
 
     def run(self):
         self.title("Pronon DB test")
@@ -42,36 +41,36 @@ class Controller(tk.Tk):
         self.mainloop()
 
     def show_frame(self, page_name):
-        for frame in self.frames.values():
-            frame.grid_remove()
-        frame = self.frames[page_name]
-        frame.grid()
-        #  frame.tkraise()
+        self.main.destroy()
 
-    def get_startpage(self):
-        return self.start_page
+        # create the new page and pack it in the container
+        cls = globals()[page_name]
+        self.main = cls(self.container, self)
+        self.main.pack(fill="both", expand=True)
 
     def send_query(self, command, table, columns, query_values=None):
         if command == 'INSERT':
-            message = 'INSERT into `' + table + '` ' + str(columns) + ' VALUES '
+            message = 'INSERT into `' + table + \
+                '` ' + str(columns) + ' VALUES '
             nr_values = tuple(['%s' for s in query_values])
             message = message + str(nr_values)
             message = message.replace("'", "")
             return_value = self.model.insert(message, query_values)
 
         if command == 'SELECT':
-            if query_values:
-                print('put WHERE statment here')
+            #  if query_values:
+                # TODO: Make queries with WHERE statment
             message = 'SELECT ' + str(columns) + ' FROM ' + table
             #  message = message.replace("'", "")
             return_value = self.model.select(message)
 
         return return_value
 
-
     def handler(self, error_type, code, message):
         if error_type == 1:
-            tk.messagebox.showwarning(title="Mysql Aviso", message=str(code)+': '+message)
+            tk.messagebox.showwarning(
+                title="Mysql Aviso", message=str(code)+': '+message)
 
         if error_type == 2:
-            tk.messagebox.showerror(title="Mysql Erro", message=str(code)+': '+message)
+            tk.messagebox.showerror(
+                title="Mysql Erro", message=str(code)+': '+message)

@@ -5,21 +5,31 @@ import tkinter.ttk as ttk
 from tkinter import LEFT, TOP, X, FLAT, RAISED
 from functools import partial
 from .paciente import *
+from .amostra import *
 
 
-class StartPage(tk.Frame):
+class Main(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Start Page", font=('Verdana', 12))
-        label.pack(side='top', fill=tk.X, pady=10)
-
-        #  button.focus_set()
-
-        button2 = tk.Button(self, text="Cadastrar Paciente",
-                            command=lambda: controller.show_frame('CadastrarPaciente'))
-        button2.pack()
+        label = ttk.Label(self, text="Main Page", font=('Arial', 12))
+        label.pack()
 
 
-        button = tk.Button(self, text="Cadastrar Amostra",
+class Navbar(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent, relief=tk.RIDGE, borderwidth=3)
+
+        button2 = ttk.Button(self, text="Paciente",
+                            command=lambda: controller.show_frame('Paciente'))
+        button2.pack(fill='x')
+
+        button = ttk.Button(self, text="Amostra",
                            command=lambda: controller.show_frame('CadastrarAmostra'))
-        button.pack()
+        button.pack(fill='x')
+
+
+class Toolbar(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, master=parent, relief=tk.RIDGE, borderwidth=3)
+        label = ttk.Label(self, text="PRONON DB", font=('Arial', 12))
+        label.pack()
