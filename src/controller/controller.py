@@ -48,22 +48,42 @@ class Controller(tk.Tk):
         self.main = cls(self.container, self)
         self.main.pack(fill="both", expand=True)
 
-    def send_query(self, command, table, columns, query_values=None):
+    def send_query(self, command, table, columns, query_values=None, where=None, where_values=None):
+        return_value = 3, '?', 'MySQL command not found'
+
         if command == 'INSERT':
             message = 'INSERT into `' + table + \
                 '` ' + str(columns) + ' VALUES '
             nr_values = tuple(['%s' for s in query_values])
             message = message + str(nr_values)
             message = message.replace("'", "")
+            print(message)
+            print(query_values)
             return_value = self.model.insert(message, query_values)
 
         if command == 'SELECT':
-            #  if query_values:
-                # TODO: Make queries with WHERE statment
-            message = 'SELECT ' + str(columns) + ' FROM ' + table
-            #  message = message.replace("'", "")
+            where_stat = ''
+            if where:
+                nr_values = tuple(['%s' for s in where])
+                where_stat = ' WHERE ' + str(where) + '=' + where_values
+            message = 'SELECT ' + str(columns) + ' FROM ' + table + where_stat
+            print(message)
             return_value = self.model.select(message)
 
+        if command == 'UPDATE':
+            set_stat = ''
+            for column in columns:
+                set_stat = set_stat + column+'=%s, '
+            #  for column, value in zip(columns, query_values):
+            #      set_stat = set_stat + column+'='+str(value)+', '
+            set_stat = set_stat[:-2]
+            
+            where_stat = ' WHERE ' + str(where) + '=' + where_values
+            message = 'UPDATE ' + table + ' SET ' + set_stat + where_stat
+
+            print(message)
+            return_value = self.model.update(message, query_values)
+            
         return return_value
 
     def handler(self, error_type, code, message):
