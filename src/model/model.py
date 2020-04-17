@@ -119,6 +119,7 @@ class Model:
 
         try:
             cursor.execute(sql_query)
+            con.commit()
             result = 0
         except Warning as warning:
             code, message = warning.args
