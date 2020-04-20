@@ -7,10 +7,95 @@ from tkcalendar import Calendar, DateEntry
 from datetime import datetime
 
 
-class Register(tk.Frame):
-    def __init__(self, parent, controller, fields):
+class Menu():
+    def __init__(self, parent, controller, table_name, fields):
         self.controller = controller
         self.parent = parent
+        #  tk.Frame.__init__(self, parent)
+
+        self.table_name = table_name
+
+        self.register = Register(self, parent, controller, fields)
+        self.update = Update(self, parent, controller, fields)
+        self.delete = Delete(self, parent, controller, fields)
+
+        self.buttonframe = tk.Frame(parent)
+
+        container = tk.Frame(parent)
+        container.pack(side="top", fill="both", expand=True)
+
+        self.buttonframe.place(in_=container, x=0, y=0,
+                               relwidth=1, relheight=1)
+
+        self.register.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        self.update.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        self.delete.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+
+        self.initUI()
+
+    def initUI(self):
+        self.buttonframe.lift()
+        register_button = ttk.Button(self.buttonframe, text="Cadastrar " + self.table_name,
+                                     command=self.register.lift, width=30)
+        register_button.pack(pady=5)
+
+        update_button = ttk.Button(self.buttonframe, text="Atualizar " + self.table_name,
+                                   command=partial(self.select_id, self.update), width=30)
+        update_button.pack(pady=5)
+
+        remove_button = ttk.Button(self.buttonframe, text="Remover " + self.table_name,
+                                   command=partial(self.select_id, self.delete), width=30)
+        remove_button.pack(pady=5)
+
+    def select_id(self, slave):
+        self.ids = self.get_rows(self.table_name)
+
+        x = self.parent.winfo_x()
+        y = self.parent.winfo_y()
+
+        self.modal = tk.Toplevel(self.parent)
+        self.modal.minsize(300, 100)
+        self.modal.geometry('+%d+%d' % (x + 200, y + 200))
+        self.modal.grab_set()
+
+        modal_label = ttk.Label(
+            self.modal, text="Selecione o " + self.table_name)
+        modal_label.pack(side=tk.TOP)
+
+        self.modal_entry = ttk.Combobox(
+            self.modal, state='readonly', values=self.ids)
+        self.modal_entry.pack(side=tk.TOP, expand=tk.YES, fill=tk.X, padx=15)
+
+        exit_button = ttk.Button(
+            self.modal, text="Fechar", command=self.modal.destroy)
+        exit_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        send_button = ttk.Button(
+            self.modal, text="Enviar", command=partial(self.raise_slave, slave))
+        send_button.pack(side=tk.RIGHT, padx=5, pady=5)
+
+    def raise_slave(self, slave):
+        slave.set_id(self.modal_entry.get())
+        self.modal.destroy()
+        slave.lift()
+
+    def raise_parent(self):
+        self.buttonframe.lift()
+
+    def get_rows(self, table):
+        table_values = self.controller.send_query('SELECT',
+                                                  table,
+                                                  '*')
+        ids = [x['id'+table] for x in table_values[2]]
+
+        return ids
+
+
+class Register(tk.Frame):
+    def __init__(self, menu, parent, controller, fields):
+        self.controller = controller
+        self.parent = parent
+        self.menu = menu
         tk.Frame.__init__(self, parent)
         self.fields = fields
         self.entries = self.make_form()
@@ -46,7 +131,7 @@ class Register(tk.Frame):
             # Combobox
             elif entry == ttk.Combobox:
                 ent = entry(row, state='readonly',
-                            values=self.fields[key]['value'], variable=ent_var)
+                            values=self.fields[key]['value'], textvariable=ent_var)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Date picker
             elif entry == DateEntry:
@@ -94,7 +179,7 @@ class Register(tk.Frame):
 
     def exit(self):
         self.refresh()
-        self.parent.raise_parent()
+        self.menu.raise_parent()
 
     def refresh(self):
         for entry in self.entries:
@@ -102,9 +187,10 @@ class Register(tk.Frame):
 
 
 class Update(tk.Frame):
-    def __init__(self, parent, controller, fields):
+    def __init__(self, menu, parent, controller, fields):
         self.controller = controller
         self.parent = parent
+        self.menu = menu
         tk.Frame.__init__(self, parent)
         self.selected_id = ''
         self.fields = fields
@@ -141,7 +227,7 @@ class Update(tk.Frame):
             # Combobox
             elif entry == ttk.Combobox:
                 ent = entry(row, state='readonly',
-                            values=self.fields[key]['value'], variable=ent_var)
+                            values=self.fields[key]['value'], textvariable=ent_var)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Date picker
             elif entry == DateEntry:
@@ -236,7 +322,7 @@ class Update(tk.Frame):
 
     def exit(self):
         self.refresh()
-        self.parent.raise_parent()
+        self.menu.raise_parent()
 
     def refresh(self):
         for entry in self.entries:
@@ -256,9 +342,10 @@ class Update(tk.Frame):
 
 
 class Delete(tk.Frame):
-    def __init__(self, parent, controller, fields):
+    def __init__(self, menu, parent, controller, fields):
         self.controller = controller
         self.parent = parent
+        self.menu = menu
         tk.Frame.__init__(self, parent)
         self.selected_id = ''
         self.fields = fields
@@ -303,7 +390,7 @@ class Delete(tk.Frame):
             # Combobox
             elif entry == ttk.Combobox:
                 ent = entry(row, state='disabled',
-                            values=self.fields[key]['value'], variable=ent_var)
+                            values=self.fields[key]['value'], textvariable=ent_var)
                 #  ent.configure(disabledforeground='black')
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Date picker
@@ -359,7 +446,7 @@ class Delete(tk.Frame):
 
     def exit(self):
         self.refresh()
-        self.parent.raise_parent()
+        self.menu.raise_parent()
 
     def refresh(self):
         for entry in self.entries:

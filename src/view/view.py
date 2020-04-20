@@ -4,8 +4,9 @@ import tkinter.ttk as ttk
 
 from tkinter import LEFT, TOP, X, FLAT, RAISED
 from functools import partial
-from .paciente import *
-from .amostra import *
+from .paciente import Paciente
+from .amostra import Amostra
+from .coleta import Coleta
 
 
 class Main(tk.Frame):
@@ -19,13 +20,17 @@ class Navbar(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent, relief=tk.RIDGE, borderwidth=3)
 
-        button2 = ttk.Button(self, text="Paciente",
+        paciente_button = ttk.Button(self, text="Paciente",
                             command=lambda: controller.show_frame('Paciente'))
-        button2.pack(fill='x')
+        paciente_button.pack(fill='x')
 
-        button = ttk.Button(self, text="Amostra",
-                           command=lambda: controller.show_frame('CadastrarAmostra'))
-        button.pack(fill='x')
+        coleta_button = ttk.Button(self, text="Coleta",
+                           command=lambda: controller.show_frame('Coleta'))
+        coleta_button.pack(fill='x')
+
+        amostra_button = ttk.Button(self, text="Amostra",
+                           command=lambda: controller.show_frame('Amostra'))
+        amostra_button.pack(fill='x')
 
 
 class Toolbar(tk.Frame):
