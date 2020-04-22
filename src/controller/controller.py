@@ -6,8 +6,6 @@ from tkinter import ttk
 
 from model.model import Model
 from view.view import *
-#  from view.paciente import *
-#  from view.amostra import *
 
 
 class Controller(tk.Tk):

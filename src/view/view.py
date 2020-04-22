@@ -5,8 +5,10 @@ import tkinter.ttk as ttk
 from tkinter import LEFT, TOP, X, FLAT, RAISED
 from functools import partial
 from .paciente import Paciente
-from .amostra import Amostra
 from .coleta import Coleta
+from .diagnostico import Diagnostico
+from .amostra import Amostra
+from .infoclinica import InfoClinica
 
 
 class Main(tk.Frame):
@@ -28,9 +30,17 @@ class Navbar(tk.Frame):
                            command=lambda: controller.show_frame('Coleta'))
         coleta_button.pack(fill='x')
 
+        diagnostico_button = ttk.Button(self, text="Diagnostico",
+                           command=lambda: controller.show_frame('Diagnostico'))
+        diagnostico_button.pack(fill='x')
+
         amostra_button = ttk.Button(self, text="Amostra",
                            command=lambda: controller.show_frame('Amostra'))
         amostra_button.pack(fill='x')
+
+        infoclinica_button = ttk.Button(self, text="Infos. Clínicas",
+                           command=lambda: controller.show_frame('InfoClinica'))
+        infoclinica_button.pack(fill='x')
 
 
 class Toolbar(tk.Frame):

@@ -11,7 +11,6 @@ class Menu():
     def __init__(self, parent, controller, table_name, fields):
         self.controller = controller
         self.parent = parent
-        #  tk.Frame.__init__(self, parent)
 
         self.table_name = table_name
 
@@ -19,11 +18,10 @@ class Menu():
         self.update = Update(self, parent, controller, fields)
         self.delete = Delete(self, parent, controller, fields)
 
-        self.buttonframe = tk.Frame(parent)
-
         container = tk.Frame(parent)
         container.pack(side="top", fill="both", expand=True)
 
+        self.buttonframe = tk.Frame(parent)
         self.buttonframe.place(in_=container, x=0, y=0,
                                relwidth=1, relheight=1)
 
@@ -91,30 +89,41 @@ class Menu():
         return ids
 
 
-class Register(tk.Frame):
-    def __init__(self, menu, parent, controller, fields):
-        self.controller = controller
+class Form():
+    def __init__(self, parent, fields, disable=False):
         self.parent = parent
-        self.menu = menu
-        tk.Frame.__init__(self, parent)
         self.fields = fields
-        self.entries = self.make_form()
-        # Send Query button
-        back_button = ttk.Button(self, text="Voltar",
-                                 command=self.exit)
-        back_button.pack(side=tk.LEFT, padx=5)
+        self.disable = disable
+        canvas = tk.Canvas(parent)
+        scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
+        self.frame = ttk.Frame(canvas)
+        self.frame.bind(
+                        "<Configure>",
+            lambda e: canvas.configure(
+                                scrollregion=canvas.bbox("all")
+                            
+            )
+                    
+        )
 
-        query_button = ttk.Button(self, text="Salvar",
-                                  command=self.callback)
-        query_button.pack(side=tk.RIGHT, padx=5)
+        canvas.create_window((0, 0), window=self.frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
     def make_form(self):
+        style = ttk.Style()
+        if self.disable:
+            style.map('TEntry',
+                      foreground=[('disabled', 'black')])
+            style.map('TRadiobutton',
+                      foreground=[('disabled', 'black')])
         entries = []
         for key in self.fields:
             label_text = self.fields[key]['label']
             entry = self.fields[key]['entry']
 
-            row = tk.Frame(self)
+            row = tk.Frame(self.frame)
             row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
             lab = ttk.Label(row, width=35, text=label_text, anchor='w')
@@ -139,6 +148,10 @@ class Register(tk.Frame):
                             textvariable=ent_var)
                 ent.delete(0, "end")
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
+            # Text box
+            elif entry == tk.Text:
+                ent_var = entry(row)
+                ent_var.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Other entries
             else:
                 ent = entry(row, textvariable=ent_var)
@@ -146,6 +159,27 @@ class Register(tk.Frame):
 
             entries.append((key, ent_var, entry))
         return entries
+
+
+class Register(tk.Frame):
+    def __init__(self, menu, parent, controller, fields):
+        self.controller = controller
+        self.parent = parent
+        self.menu = menu
+        tk.Frame.__init__(self, parent)
+
+        self.fields = fields
+        self.form = Form(self, fields)
+        self.entries = self.form.make_form()
+
+        # Send Query button
+        back_button = ttk.Button(self.form.frame, text="Voltar",
+                                 command=self.exit)
+        back_button.pack(side=tk.LEFT, padx=5)
+
+        query_button = ttk.Button(self.form.frame, text="Salvar",
+                                  command=self.callback)
+        query_button.pack(side=tk.RIGHT, padx=5)
 
     def callback(self):
         query_values = []
@@ -162,6 +196,15 @@ class Register(tk.Frame):
                 date = text.split('/')
                 text = date[2] + '/' + date[1] + '/' + date[0]
 
+            if entry_type == ttk.Radiobutton and text == 'Desconhecido':
+                text = 2
+
+            if entry_type == ttk.Radiobutton and text == 'Sim':
+                text = 1
+
+            if entry_type == ttk.Radiobutton and text == 'Não':
+                text = 0
+
             column_names.append(key)
             query_values.append(text)
 
@@ -174,7 +217,8 @@ class Register(tk.Frame):
             self.controller.handler(*result)
 
         if not result[0]:
-            tk.messagebox.showinfo(message=self.parent.table_name + " cadastrado com sucesso!")
+            tk.messagebox.showinfo(
+                message=self.parent.table_name + " cadastrado com sucesso!")
             self.exit()
 
     def exit(self):
@@ -194,54 +238,16 @@ class Update(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.selected_id = ''
         self.fields = fields
-        self.entries = self.make_form()
+        self.form = Form(self, fields)
+        self.entries = self.form.make_form()
         # Send Query button
-        back_button = ttk.Button(self, text="Voltar",
+        back_button = ttk.Button(self.form.frame, text="Voltar",
                                  command=self.exit)
         back_button.pack(side=tk.LEFT, padx=5)
 
-        query_button = ttk.Button(self, text="Salvar",
+        query_button = ttk.Button(self.form.frame, text="Salvar",
                                   command=self.callback)
         query_button.pack(side=tk.RIGHT, padx=5)
-
-    def make_form(self):
-        entries = []
-        for key in self.fields:
-            label_text = self.fields[key]['label']
-            entry = self.fields[key]['entry']
-
-            row = tk.Frame(self)
-            row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-
-            lab = ttk.Label(row, width=35, text=label_text, anchor='w')
-            lab.pack(side=tk.LEFT, padx=15)
-
-            ent_var = tk.StringVar()
-            ent_var.set('')
-
-            # In case that the entry is a radiobutton
-            if entry == ttk.Radiobutton:
-                for v in self.fields[key]['value']:
-                    ent = entry(row, text=v[0], value=v[1], variable=ent_var)
-                    ent.pack(side=tk.LEFT, padx=15)
-            # Combobox
-            elif entry == ttk.Combobox:
-                ent = entry(row, state='readonly',
-                            values=self.fields[key]['value'], textvariable=ent_var)
-                ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
-            # Date picker
-            elif entry == DateEntry:
-                ent = entry(row, date_pattern='dd/mm/yyyy',
-                            textvariable=ent_var)
-                ent.delete(0, "end")
-                ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
-            # Other entries
-            else:
-                ent = entry(row, textvariable=ent_var)
-                ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
-
-            entries.append((key, ent_var, entry))
-        return entries
 
     def update_form(self):
         row_values = list(self.row.values())[1:]
@@ -317,7 +323,8 @@ class Update(tk.Frame):
             self.controller.handler(*result)
 
         if not result[0]:
-            tk.messagebox.showinfo(message=self.parent.table_name + " atualizado com sucesso!")
+            tk.messagebox.showinfo(
+                message=self.parent.table_name + " atualizado com sucesso!")
             self.exit()
 
     def exit(self):
@@ -349,13 +356,14 @@ class Delete(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.selected_id = ''
         self.fields = fields
-        self.entries = self.make_form()
+        self.form = Form(self, fields, disable=True)
+        self.entries = self.form.make_form()
         # Send Query button
-        back_button = ttk.Button(self, text="Voltar",
+        back_button = ttk.Button(self.form.frame, text="Voltar",
                                  command=self.exit)
         back_button.pack(side=tk.LEFT, padx=5)
 
-        query_button = ttk.Button(self, text="Remover",
+        query_button = ttk.Button(self.form.frame, text="Remover",
                                   command=self.callback)
         query_button.pack(side=tk.RIGHT, padx=5)
 
@@ -425,7 +433,8 @@ class Delete(tk.Frame):
 
     def callback(self):
 
-        confirm_message = "Tem certeza que deseja deletar \n\n" + self.parent.table_name + " : "+ self.selected_id
+        confirm_message = "Tem certeza que deseja deletar \n\n" + \
+            self.parent.table_name + " : " + self.selected_id
         confirm_response = tk.messagebox.askyesno(message=confirm_message)
 
         if not confirm_response:
@@ -441,7 +450,8 @@ class Delete(tk.Frame):
             self.controller.handler(*result)
 
         if not result[0]:
-            tk.messagebox.showinfo(message=self.parent.table_name+" : "+self.selected_id+" removido com sucesso!")
+            tk.messagebox.showinfo(
+                message=self.parent.table_name+" : "+self.selected_id+" removido com sucesso!")
             self.exit()
 
     def exit(self):
@@ -463,3 +473,28 @@ class Delete(tk.Frame):
 
         self.row = selected_row[0]
         self.update_form()
+
+
+class ScrollableFrame(ttk.Frame):
+    def __init__(self, container, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
+        canvas = tk.Canvas(self)
+        scrollbar = ttk.Scrollbar(
+            self, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = ttk.Frame(canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+
+            )
+
+        )
+
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")

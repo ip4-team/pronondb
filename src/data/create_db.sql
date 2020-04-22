@@ -163,7 +163,7 @@ CREATE TABLE InfoClinica (
     CateterEstado ENUM('Removido e não recolocado', 'Removido e recolocado em outro sítio', 'Removido e recolocado por cateter guia', 'Paciente sem cateter', 'Não', 'Desconhecido') NOT NULL,
     InfeccaoTipo ENUM('Comunitária', 'Nosocomial', 'Colonização') NOT NULL,
     InfeccaoNosocomial ENUM('Intra-hospitalar', 'Ambulatorial', 'Home-care', 'Não') NOT NULL,
-    InfeccaoOrigem ENUM('Endógena', 'Exógena', 'Desconhecida'),
+    InfeccaoOrigem ENUM('Endógena', 'Exógena', 'Desconhecida') NOT NULL, 
     FOREIGN KEY (idColeta) REFERENCES Coleta (idColeta)
 ) ENGINE=InnoDB;
 
