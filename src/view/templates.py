@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from functools import partial
 from tkcalendar import Calendar, DateEntry
+from tkinter.scrolledtext import ScrolledText
 
 from datetime import datetime
 
@@ -66,11 +67,11 @@ class Menu():
 
         exit_button = ttk.Button(
             self.modal, text="Fechar", command=self.modal.destroy)
-        exit_button.pack(side=tk.LEFT, padx=5, pady=5)
+        exit_button.pack(side=tk.LEFT, padx=5, pady=25)
 
         send_button = ttk.Button(
             self.modal, text="Enviar", command=partial(self.raise_slave, slave))
-        send_button.pack(side=tk.RIGHT, padx=5, pady=5)
+        send_button.pack(side=tk.RIGHT, padx=5, pady=25)
 
     def raise_slave(self, slave):
         slave.set_id(self.modal_entry.get())
@@ -94,22 +95,24 @@ class Form():
         self.parent = parent
         self.fields = fields
         self.disable = disable
-        canvas = tk.Canvas(parent)
+        canvas = tk.Canvas(parent, highlightthickness=0)
         scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
-        self.frame = ttk.Frame(canvas)
-        self.frame.bind(
-                        "<Configure>",
-            lambda e: canvas.configure(
-                                scrollregion=canvas.bbox("all")
-                            
-            )
-                    
-        )
 
-        canvas.create_window((0, 0), window=self.frame, anchor="nw")
+        self.frame = ttk.Frame(canvas)
+        self.frame.grid_columnconfigure(0, weight=1)
+        self.frame.bind("<Configure>",
+                        lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        canvas.fram_n_canvas_iid = canvas.create_window((0, 0), window=self.frame, anchor='nw')
         canvas.configure(yscrollcommand=scrollbar.set)
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side=tk.LEFT, fill='both', expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill='y')
+
+        canvas.bind("<Configure>", self.canvas_configure)
+
+    def canvas_configure(self, event):
+        canvas = event.widget
+        canvas.itemconfigure(canvas.fram_n_canvas_iid, width=canvas.winfo_width())
 
     def make_form(self):
         style = ttk.Style()
@@ -118,6 +121,13 @@ class Form():
                       foreground=[('disabled', 'black')])
             style.map('TRadiobutton',
                       foreground=[('disabled', 'black')])
+
+            entry_state = 'disabled'
+            combobox_state = 'disabled'
+        else:
+            entry_state = 'normal'
+            combobox_state = 'readonly'
+
         entries = []
         for key in self.fields:
             label_text = self.fields[key]['label']
@@ -135,26 +145,27 @@ class Form():
             # In case that the entry is a radiobutton
             if entry == ttk.Radiobutton:
                 for v in self.fields[key]['value']:
-                    ent = entry(row, text=v[0], value=v[1], variable=ent_var)
+                    ent = entry(row, text=v[0], value=v[1], variable=ent_var,
+                                state=entry_state)
                     ent.pack(side=tk.LEFT, padx=15)
             # Combobox
             elif entry == ttk.Combobox:
-                ent = entry(row, state='readonly',
+                ent = entry(row, state=combobox_state, 
                             values=self.fields[key]['value'], textvariable=ent_var)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Date picker
             elif entry == DateEntry:
                 ent = entry(row, date_pattern='dd/mm/yyyy',
-                            textvariable=ent_var)
+                            textvariable=ent_var, state=entry_state)
                 ent.delete(0, "end")
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Text box
-            elif entry == tk.Text:
-                ent_var = entry(row)
+            elif entry == ScrolledText:
+                ent_var = entry(row, wrap=tk.WORD, width=20, height=10)
                 ent_var.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Other entries
             else:
-                ent = entry(row, textvariable=ent_var)
+                ent = entry(row, textvariable=ent_var, state=entry_state)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
 
             entries.append((key, ent_var, entry))
@@ -175,19 +186,22 @@ class Register(tk.Frame):
         # Send Query button
         back_button = ttk.Button(self.form.frame, text="Voltar",
                                  command=self.exit)
-        back_button.pack(side=tk.LEFT, padx=5)
+        back_button.pack(side=tk.LEFT, padx=5, pady=50)
 
         query_button = ttk.Button(self.form.frame, text="Salvar",
                                   command=self.callback)
-        query_button.pack(side=tk.RIGHT, padx=5)
+        query_button.pack(side=tk.RIGHT, padx=5, pady=50)
 
     def callback(self):
         query_values = []
         column_names = []
         for entry in self.entries:
             key = entry[0]
-            text = entry[1].get()
             entry_type = entry[2]
+            if entry_type == ScrolledText:
+                text = entry[1].get('1.0', tk.END)
+            else:
+                text = entry[1].get()
 
             if text == '':
                 text = None
@@ -195,15 +209,6 @@ class Register(tk.Frame):
             if entry_type == DateEntry and text != None:
                 date = text.split('/')
                 text = date[2] + '/' + date[1] + '/' + date[0]
-
-            if entry_type == ttk.Radiobutton and text == 'Desconhecido':
-                text = 2
-
-            if entry_type == ttk.Radiobutton and text == 'Sim':
-                text = 1
-
-            if entry_type == ttk.Radiobutton and text == 'Não':
-                text = 0
 
             column_names.append(key)
             query_values.append(text)
@@ -227,7 +232,10 @@ class Register(tk.Frame):
 
     def refresh(self):
         for entry in self.entries:
-            entry[1].set('')
+            if entry[2] == ScrolledText:
+                entry[1].delete('1.0', tk.END)
+            else:
+                entry[1].set('')
 
 
 class Update(tk.Frame):
@@ -262,7 +270,10 @@ class Update(tk.Frame):
                 entry[1].set(date_fix)
                 continue
 
-            entry[1].set(value)
+            if entry[2] == ScrolledText:
+                text = entry[1].insert(tk.END, value)
+            else:
+                entry[1].set(value)
 
     def callback(self):
         old_values = []
@@ -274,7 +285,11 @@ class Update(tk.Frame):
         for entry, value in zipped_entries:
             key = entry[0]
             entry_type = entry[2]
-            text = entry[1].get()
+            entry_type = entry[2]
+            if entry_type == ScrolledText:
+                text = entry[1].get('1.0', tk.END)
+            else:
+                text = entry[1].get()
 
             if entry_type == DateEntry:
                 value = value.strftime('%Y/%m/%d')
@@ -333,11 +348,13 @@ class Update(tk.Frame):
 
     def refresh(self):
         for entry in self.entries:
-            entry[1].set('')
+            if entry[2] == ScrolledText:
+                text = entry[1].get('1.0', tk.END)
+            else:
+                text = entry[1].get()
 
     def set_id(self, input_id):
         self.selected_id = input_id
-
         code, message, selected_row = self.controller.send_query('SELECT',
                                                                  self.parent.table_name,
                                                                  '*',
@@ -367,55 +384,6 @@ class Delete(tk.Frame):
                                   command=self.callback)
         query_button.pack(side=tk.RIGHT, padx=5)
 
-    def make_form(self):
-        style = ttk.Style()
-        style.map('TEntry',
-                  foreground=[('disabled', 'black')])
-        style.map('TRadiobutton',
-                  foreground=[('disabled', 'black')])
-
-        entries = []
-        for key in self.fields:
-            label_text = self.fields[key]['label']
-            entry = self.fields[key]['entry']
-
-            row = tk.Frame(self)
-            row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-
-            lab = ttk.Label(row, width=35, text=label_text, anchor='w')
-            lab.pack(side=tk.LEFT, padx=15)
-
-            ent_var = tk.StringVar()
-            ent_var.set('')
-
-            # In case that the entry is a radiobutton
-            if entry == ttk.Radiobutton:
-                for v in self.fields[key]['value']:
-                    ent = entry(row, state='disabled',
-                                text=v[0], value=v[1], variable=ent_var)
-                    #  ent.configure(disabledforeground='black')
-                    ent.pack(side=tk.LEFT, padx=15)
-            # Combobox
-            elif entry == ttk.Combobox:
-                ent = entry(row, state='disabled',
-                            values=self.fields[key]['value'], textvariable=ent_var)
-                #  ent.configure(disabledforeground='black')
-                ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
-            # Date picker
-            elif entry == DateEntry:
-                ent = entry(row, state='disabled', date_pattern='dd/mm/yyyy',
-                            textvariable=ent_var)
-                ent.delete(0, "end")
-                ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
-            # Other entries
-            else:
-                ent = entry(row, state='disabled', textvariable=ent_var)
-                #  ent.configure(disabledforeground='black')
-                ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
-
-            entries.append((key, ent_var, entry))
-        return entries
-
     def update_form(self):
         row_values = list(self.row.values())[1:]
         entry_objs = [x[1] for x in self.entries]
@@ -429,7 +397,11 @@ class Delete(tk.Frame):
                 entry[1].set(date_fix)
                 continue
 
-            entry[1].set(value)
+            if entry[2] == ScrolledText:
+                text = entry[1].insert(tk.END, value)
+                entry[1].config(state='disabled')
+            else:
+                entry[1].set(value)
 
     def callback(self):
 
@@ -460,7 +432,10 @@ class Delete(tk.Frame):
 
     def refresh(self):
         for entry in self.entries:
-            entry[1].set('')
+            if entry[2] == ScrolledText:
+                entry[1].delete('1.0', tk.END)
+            else:
+                entry[1].set('')
 
     def set_id(self, input_id):
         self.selected_id = input_id
@@ -473,28 +448,3 @@ class Delete(tk.Frame):
 
         self.row = selected_row[0]
         self.update_form()
-
-
-class ScrollableFrame(ttk.Frame):
-    def __init__(self, container, *args, **kwargs):
-        super().__init__(container, *args, **kwargs)
-        canvas = tk.Canvas(self)
-        scrollbar = ttk.Scrollbar(
-            self, orient="vertical", command=canvas.yview)
-        self.scrollable_frame = ttk.Frame(canvas)
-
-        self.scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-
-            )
-
-        )
-
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")

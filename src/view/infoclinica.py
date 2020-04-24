@@ -3,6 +3,7 @@ import tkinter as tk
 
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
+from tkinter.scrolledtext import ScrolledText
 from functools import partial
 
 from .templates import *
@@ -63,7 +64,7 @@ class InfoClinica(tk.Frame):
                                           ('Não', 0),
                                           ('Desconhecido', 2)]},
             'OutrosSinaisClinicos': {'label': 'Outros sinais clínicos',
-                                    'entry': tk.Text},
+                                    'entry': ScrolledText},
             'ProvavelSitioInfeccioso': {'label': 'Provavel sítio infeccioso',
                                         'entry': ttk.Combobox,
                                         'value':['ICS',
