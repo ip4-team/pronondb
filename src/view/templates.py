@@ -14,28 +14,31 @@ class Menu():
         self.parent = parent
 
         self.table_name = table_name
-
-        self.register = Register(self, parent, controller, fields)
-        self.update = Update(self, parent, controller, fields)
-        self.delete = Delete(self, parent, controller, fields)
+        self.modal_isopen = False
 
         container = tk.Frame(parent)
         container.pack(side="top", fill="both", expand=True)
+
+        self.form_frame = tk.Frame(parent)
+        self.form_frame.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
 
         self.buttonframe = tk.Frame(parent)
         self.buttonframe.place(in_=container, x=0, y=0,
                                relwidth=1, relheight=1)
 
-        self.register.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
-        self.update.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
-        self.delete.place(in_=container, x=0, y=0, relwidth=1, relheight=1)
+        self.form = Form(self.form_frame, fields)
+        self.entries = self.form.make_form()
+
+        self.register = Register(self, parent, controller, self.entries)
+        self.update = Update(self, parent, controller, self.entries)
+        self.delete = Delete(self, parent, controller, self.entries)
 
         self.initUI()
 
     def initUI(self):
         self.buttonframe.lift()
         register_button = ttk.Button(self.buttonframe, text="Cadastrar " + self.table_name,
-                                     command=self.register.lift, width=30)
+                                     command=partial(self.raise_slave, self.register), width=30)
         register_button.pack(pady=5)
 
         update_button = ttk.Button(self.buttonframe, text="Atualizar " + self.table_name,
@@ -59,24 +62,36 @@ class Menu():
 
         modal_label = ttk.Label(
             self.modal, text="Selecione o " + self.table_name)
-        modal_label.pack(side=tk.TOP)
+        modal_label.pack(side=tk.TOP, pady=10)
 
         self.modal_entry = ttk.Combobox(
             self.modal, state='readonly', values=self.ids)
-        self.modal_entry.pack(side=tk.TOP, expand=tk.YES, fill=tk.X, padx=15)
+        self.modal_entry.pack(side=tk.TOP, expand=tk.YES, fill=tk.X, padx=15,
+                              pady=10)
 
         exit_button = ttk.Button(
-            self.modal, text="Fechar", command=self.modal.destroy)
-        exit_button.pack(side=tk.LEFT, padx=5, pady=25)
+            self.modal, text="Fechar", command=self.destroy_modal)
+        exit_button.pack(side=tk.LEFT, padx=5, pady=15)
 
         send_button = ttk.Button(
             self.modal, text="Enviar", command=partial(self.raise_slave, slave))
-        send_button.pack(side=tk.RIGHT, padx=5, pady=25)
+        send_button.pack(side=tk.RIGHT, padx=5, pady=15)
+
+        self.modal_isopen = True
 
     def raise_slave(self, slave):
-        slave.set_id(self.modal_entry.get())
+        if self.modal_isopen:
+            slave.set_id(self.modal_entry.get())
+            self.modal.destroy()
+            self.modal_isopen = False
+
+        self.form.back_button.config(command=slave.exit)
+        self.form.query_button.config(command=slave.callback)
+        self.form_frame.lift()
+
+    def destroy_modal(self):
         self.modal.destroy()
-        slave.lift()
+        self.modal_isopen = False
 
     def raise_parent(self):
         self.buttonframe.lift()
@@ -109,6 +124,9 @@ class Form():
         scrollbar.pack(side=tk.RIGHT, fill='y')
 
         canvas.bind("<Configure>", self.canvas_configure)
+
+        self.back_button = ttk.Button(self.frame, text="Voltar")
+        self.query_button = ttk.Button(self.frame, text="Salvar")
 
     def canvas_configure(self, event):
         canvas = event.widget
@@ -169,28 +187,19 @@ class Form():
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
 
             entries.append((key, ent_var, entry))
+        # Send Query button
+        self.back_button.pack(side=tk.LEFT, padx=5, pady=50)
+        self.query_button.pack(side=tk.RIGHT, padx=5, pady=50)
         return entries
 
 
-class Register(tk.Frame):
-    def __init__(self, menu, parent, controller, fields):
+class Register():
+    def __init__(self, menu, parent, controller, entries):
         self.controller = controller
         self.parent = parent
         self.menu = menu
-        tk.Frame.__init__(self, parent)
 
-        self.fields = fields
-        self.form = Form(self, fields)
-        self.entries = self.form.make_form()
-
-        # Send Query button
-        back_button = ttk.Button(self.form.frame, text="Voltar",
-                                 command=self.exit)
-        back_button.pack(side=tk.LEFT, padx=5, pady=50)
-
-        query_button = ttk.Button(self.form.frame, text="Salvar",
-                                  command=self.callback)
-        query_button.pack(side=tk.RIGHT, padx=5, pady=50)
+        self.entries = entries
 
     def callback(self):
         query_values = []
@@ -237,25 +246,17 @@ class Register(tk.Frame):
             else:
                 entry[1].set('')
 
+    def set_id(self):
+        pass
 
-class Update(tk.Frame):
-    def __init__(self, menu, parent, controller, fields):
+class Update():
+    def __init__(self, menu, parent, controller, entries):
         self.controller = controller
         self.parent = parent
         self.menu = menu
-        tk.Frame.__init__(self, parent)
         self.selected_id = ''
-        self.fields = fields
-        self.form = Form(self, fields)
-        self.entries = self.form.make_form()
-        # Send Query button
-        back_button = ttk.Button(self.form.frame, text="Voltar",
-                                 command=self.exit)
-        back_button.pack(side=tk.LEFT, padx=5)
 
-        query_button = ttk.Button(self.form.frame, text="Salvar",
-                                  command=self.callback)
-        query_button.pack(side=tk.RIGHT, padx=5)
+        self.entries = entriei
 
     def update_form(self):
         row_values = list(self.row.values())[1:]
@@ -271,7 +272,7 @@ class Update(tk.Frame):
                 continue
 
             if entry[2] == ScrolledText:
-                text = entry[1].insert(tk.END, value)
+                entry[1].insert('1.0', value[:-1])
             else:
                 entry[1].set(value)
 
@@ -349,9 +350,9 @@ class Update(tk.Frame):
     def refresh(self):
         for entry in self.entries:
             if entry[2] == ScrolledText:
-                text = entry[1].get('1.0', tk.END)
+                text = entry[1].delete('1.0', tk.END)
             else:
-                text = entry[1].get()
+                text = entry[1].set('')
 
     def set_id(self, input_id):
         self.selected_id = input_id
@@ -365,24 +366,13 @@ class Update(tk.Frame):
         self.update_form()
 
 
-class Delete(tk.Frame):
-    def __init__(self, menu, parent, controller, fields):
+class Delete():
+    def __init__(self, menu, parent, controller, entries):
         self.controller = controller
         self.parent = parent
         self.menu = menu
-        tk.Frame.__init__(self, parent)
         self.selected_id = ''
-        self.fields = fields
-        self.form = Form(self, fields, disable=True)
-        self.entries = self.form.make_form()
-        # Send Query button
-        back_button = ttk.Button(self.form.frame, text="Voltar",
-                                 command=self.exit)
-        back_button.pack(side=tk.LEFT, padx=5)
-
-        query_button = ttk.Button(self.form.frame, text="Remover",
-                                  command=self.callback)
-        query_button.pack(side=tk.RIGHT, padx=5)
+        self.entries = entries
 
     def update_form(self):
         row_values = list(self.row.values())[1:]
@@ -398,13 +388,12 @@ class Delete(tk.Frame):
                 continue
 
             if entry[2] == ScrolledText:
-                text = entry[1].insert(tk.END, value)
+                text = entry[1].insert('1.0', value)
                 entry[1].config(state='disabled')
             else:
                 entry[1].set(value)
 
     def callback(self):
-
         confirm_message = "Tem certeza que deseja deletar \n\n" + \
             self.parent.table_name + " : " + self.selected_id
         confirm_response = tk.messagebox.askyesno(message=confirm_message)
