@@ -3,6 +3,7 @@ import datetime
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter.ttk import Progressbar
 
 from model.model import Model
 from view.view import *
@@ -43,7 +44,6 @@ class Controller(tk.Tk):
 
         # create the new page and pack it in the container
         cls = globals()[page_name]
-
         self.main = cls(self.container, self)
 
         self.main.pack(fill="both", expand=True)
@@ -72,7 +72,7 @@ class Controller(tk.Tk):
             for column in columns:
                 set_stat = set_stat + column+'=%s, '
             set_stat = set_stat[:-2]
-            
+
             where_stat = ' WHERE ' + str(where) + '=' + where_values
             message = 'UPDATE ' + table + ' SET ' + set_stat + where_stat
 
@@ -80,11 +80,11 @@ class Controller(tk.Tk):
 
         if command == 'DELETE':
             where_stat = ' WHERE ' + str(where) + '=' + where_values
-            message = 'DELETE from ' + table + where_stat 
+            message = 'DELETE from ' + table + where_stat
 
             print(message)
             return_value = self.model.delete(message)
-            
+
         return return_value
 
     def handler(self, error_type, code, message):
@@ -95,3 +95,12 @@ class Controller(tk.Tk):
         if error_type == 2:
             tk.messagebox.showerror(
                 title="Mysql Erro", message=str(code)+': '+message)
+
+    def get_rows_ids(self, table):
+        table_values = self.send_query('SELECT',
+                                                  table,
+                                                  '*')
+        ids = [x['id'+table] for x in table_values[2]]
+
+        return ids
+

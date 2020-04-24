@@ -15,7 +15,7 @@ class InfoClinica(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.table_name = self.__class__.__name__
 
-        coleta_values = self.get_rows('Coleta')
+        coleta_values = controller.get_rows_ids('Coleta')
 
         fields = {
             'idColeta':     {'label': 'Coleta',
@@ -116,12 +116,3 @@ class InfoClinica(tk.Frame):
         }
 
         main_page = Menu(self, controller, self.table_name, fields)
-
-    def get_rows(self, table):
-        table_values = self.controller.send_query('SELECT',
-                                                  table,
-                                                  '*')
-        ids = [x['id'+table] for x in table_values[2]]
-
-        return ids
-

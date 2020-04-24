@@ -8,6 +8,7 @@ from .paciente import Paciente
 from .coleta import Coleta
 from .diagnostico import Diagnostico
 from .amostra import Amostra
+from .teste import Teste
 from .infoclinica import InfoClinica
 
 
@@ -37,6 +38,10 @@ class Navbar(tk.Frame):
         amostra_button = ttk.Button(self, text="Amostra",
                            command=lambda: controller.show_frame('Amostra'))
         amostra_button.pack(fill='x')
+
+        teste_button = ttk.Button(self, text="Teste",
+                           command=lambda: controller.show_frame('Teste'))
+        teste_button.pack(fill='x')
 
         infoclinica_button = ttk.Button(self, text="Infos. Clínicas",
                            command=lambda: controller.show_frame('InfoClinica'))

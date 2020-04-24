@@ -14,7 +14,7 @@ class Coleta(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.table_name = 'Coleta'
 
-        paciente_values = self.get_rows('Paciente')
+        paciente_values = controller.get_rows_ids('Paciente')
 
         fields = {
             'idPaciente':   {'label': 'Paciente',
@@ -29,12 +29,3 @@ class Coleta(tk.Frame):
         }
 
         main_page = Menu(self, controller, self.table_name, fields)
-        #  main_page.pack(fill=tk.BOTH, expand=True)
-
-    def get_rows(self, table):
-        table_values = self.controller.send_query('SELECT',
-                                                  table,
-                                                  '*')
-        ids = [x['id'+table] for x in table_values[2]]
-
-        return ids

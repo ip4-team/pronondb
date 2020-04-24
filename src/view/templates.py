@@ -256,7 +256,7 @@ class Update():
         self.menu = menu
         self.selected_id = ''
 
-        self.entries = entriei
+        self.entries = entries
 
     def update_form(self):
         row_values = list(self.row.values())[1:]
