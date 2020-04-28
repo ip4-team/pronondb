@@ -9,7 +9,7 @@ if __name__ == '__main__':
     user = 'gabriel'
     pswd = 'olescki'
     db = 'Pronondb'
-    
+
     m = Model(ip, user, pswd, db)
     c = Controller(m)
     c.run()

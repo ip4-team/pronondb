@@ -8,14 +8,14 @@ from functools import partial
 from .templates import *
 
 
-class Amostra(tk.Frame):
+class AmostraRNA(tk.Frame):
     def __init__(self, parent, controller):
         self.controller = controller
         tk.Frame.__init__(self, parent)
-        self.table_name = 'Amostra'
+        self.table_name = self.table_name = self.__class__.__name__
 
-        paciente_values = self.get_rows('Paciente')
-        coleta_values = self.get_rows('Coleta')
+        paciente_values = controller.get_rows_ids('Paciente')
+        coleta_values = controller.get_rows_ids('Coleta')
 
         fields = {
             'idPaciente':   {'label': 'Paciente',
@@ -40,15 +40,10 @@ class Amostra(tk.Frame):
                                  'entry': ttk.Entry},
             'DataQubit':        {'label': 'Data de medida da concentração de qubit',
                                  'entry': DateEntry},
+            'IntegridadeTapStation':{'label': 'Integridade aferida no TapStation',
+                                 'entry': ttk.Entry},
+            'DataTapeStation':  {'label': 'Data de medida da concentração de qubit',
+                                 'entry': DateEntry}
         }
 
         main_page = Menu(self, controller, self.table_name, fields)
-        #  main_page.pack(fill=tk.BOTH, expand=True)
-
-    def get_rows(self, table):
-        table_values = self.controller.send_query('SELECT',
-                                                  table,
-                                                  '*')
-        ids = [x['id'+table] for x in table_values[2]]
-
-        return ids

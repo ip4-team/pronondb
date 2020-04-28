@@ -82,7 +82,6 @@ class Controller(tk.Tk):
             where_stat = ' WHERE ' + str(where) + '=' + where_values
             message = 'DELETE from ' + table + where_stat
 
-            print(message)
             return_value = self.model.delete(message)
 
         return return_value

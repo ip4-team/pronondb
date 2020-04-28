@@ -73,10 +73,21 @@ CREATE TABLE Amostra (
 
 DROP TABLE IF EXISTS AmostraRNA;
 CREATE TABLE AmostraRNA (
-    idAmostra INT UNSIGNED NOT NULL,
+    idAmostraRNA INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    idPaciente INT UNSIGNED NOT NULL,
+    idColeta INT UNSIGNED NOT NULL,
+    DataExtracao DATE NOT NULL,
+    Caixa CHAR(255) NOT NULL,
+    PosicaoCaixa CHAR(255) NOT NULL,
+    Freezer CHAR(255) NOT NULL,
+    ConcentracaoNanovue FLOAT NOT NULL,
+    DataNanovue DATE NOT NULL,
+    ConcentracaoQubit FLOAT NOT NULL,
+    DataQubit DATE NOT NULL,
     IntegridadeTapStation CHAR(255) NOT NULL,
-    DataTapeStation DATE,
-    FOREIGN KEY (idAmostra) REFERENCES Amostra (idAmostra)
+    DataTapeStation DATE NOT NULL,
+    FOREIGN KEY (idPaciente) REFERENCES Paciente (idPaciente),
+    FOREIGN KEY (idColeta) REFERENCES Coleta (idColeta)
 ) ENGINE=InnoDB;
 
 ---------------------------------------------------------------
@@ -95,32 +106,18 @@ CREATE TABLE Teste (
 ) ENGINE=InnoDB;
 
 ---------------------------------------------------------------
---  TipoTeste
----------------------------------------------------------------
-
-DROP TABLE IF EXISTS TipoTeste;
-CREATE TABLE TipoTeste (
-    idTipoTeste INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    idTeste INT UNSIGNED NOT NULL,
-    DescricaoTeste TEXT NOT NULL,
-    FOREIGN KEY (idTeste) REFERENCES Teste (idTeste)
-) ENGINE=InnoDB;
-
----------------------------------------------------------------
 --  RNASeq
 ---------------------------------------------------------------
 
-DROP TABLE IF EXISTS RNASeq;
-CREATE TABLE RNASeq (
-    idTipoTeste INT UNSIGNED NOT NULL,
-    Metodo ENUM('Transcriptoma total', 'Ampliseq', 'SMART3seq') NOT NULL,
-    DataPreparo DATE NOT NULL,
-    DataCorrida DATE NOT NULL,
-    Barcode CHAR(255),
-    NomeRegistroIon CHAR(255),
-    Qualidade CHAR(255),
-    FOREIGN KEY (idTipoTeste) REFERENCES TipoTeste (idTipoTeste)
-) ENGINE=InnoDB;
+--  DROP TABLE IF EXISTS RNASeq;
+--  CREATE TABLE RNASeq (
+--      Metodo ENUM('Transcriptoma total', 'Ampliseq', 'SMART3seq') NOT NULL,
+--      DataPreparo DATE NOT NULL,
+--      DataCorrida DATE NOT NULL,
+--      Barcode CHAR(255) NOT NULL,
+--      NomeRegistroIon CHAR(255) NOT NULL,
+--      Qualidade CHAR(255) NOT NULL,
+--  ) ENGINE=InnoDB;
 
 ---------------------------------------------------------------
 --  Internamento

@@ -126,7 +126,11 @@ class Form():
         canvas.bind("<Configure>", self.canvas_configure)
 
         self.back_button = ttk.Button(self.frame, text="Voltar")
-        self.query_button = ttk.Button(self.frame, text="Salvar")
+        if disable:
+            query_button_label = "Deletar"
+        else:
+            query_button_label = "Salvar"
+        self.query_button = ttk.Button(self.frame, text=query_button_label)
 
     def canvas_configure(self, event):
         canvas = event.widget
@@ -168,7 +172,7 @@ class Form():
                     ent.pack(side=tk.LEFT, padx=15)
             # Combobox
             elif entry == ttk.Combobox:
-                ent = entry(row, state=combobox_state, 
+                ent = entry(row, state=combobox_state,
                             values=self.fields[key]['value'], textvariable=ent_var)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
             # Date picker

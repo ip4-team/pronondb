@@ -7,9 +7,14 @@ from functools import partial
 from .paciente import Paciente
 from .coleta import Coleta
 from .diagnostico import Diagnostico
-from .amostra import Amostra
+from .amostrarna import AmostraRNA
 from .teste import Teste
+from .internamento import Internamento
 from .infoclinica import InfoClinica
+from .infomicrobiologica import InfoMicroBiologica
+from .obito import Obito
+from .medicamento import Medicamento
+from .tipotratamento import TipoTratamento
 
 
 class Main(tk.Frame):
@@ -35,17 +40,37 @@ class Navbar(tk.Frame):
                            command=lambda: controller.show_frame('Diagnostico'))
         diagnostico_button.pack(fill='x')
 
-        amostra_button = ttk.Button(self, text="Amostra",
-                           command=lambda: controller.show_frame('Amostra'))
-        amostra_button.pack(fill='x')
+        amostrarna_button = ttk.Button(self, text="AmostraRNA",
+                           command=lambda: controller.show_frame('AmostraRNA'))
+        amostrarna_button.pack(fill='x')
 
         teste_button = ttk.Button(self, text="Teste",
                            command=lambda: controller.show_frame('Teste'))
         teste_button.pack(fill='x')
 
+        internamento_button = ttk.Button(self, text="Internamento",
+                           command=lambda: controller.show_frame('Internamento'))
+        internamento_button.pack(fill='x')
+
         infoclinica_button = ttk.Button(self, text="Infos. Clínicas",
                            command=lambda: controller.show_frame('InfoClinica'))
         infoclinica_button.pack(fill='x')
+
+        infomicrobio_button = ttk.Button(self, text="Infos. Micro Biologica",
+                           command=lambda: controller.show_frame('InfoMicroBiologica'))
+        infomicrobio_button.pack(fill='x')
+
+        obito_button = ttk.Button(self, text="Obito",
+                           command=lambda: controller.show_frame('Obito'))
+        obito_button.pack(fill='x')
+
+        medicamento_button = ttk.Button(self, text="Medicamento",
+                           command=lambda: controller.show_frame('Medicamento'))
+        medicamento_button.pack(fill='x')
+
+        tipotratamento_button = ttk.Button(self, text="Tipo Tratamento",
+                           command=lambda: controller.show_frame('TipoTratamento'))
+        tipotratamento_button.pack(fill='x')
 
 
 class Toolbar(tk.Frame):
