@@ -6,7 +6,7 @@ from tkcalendar import Calendar, DateEntry
 from tkinter.scrolledtext import ScrolledText
 from functools import partial
 
-from .templates import *
+from ..templates import *
 
 
 class InfoClinica(tk.Frame):

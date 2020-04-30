@@ -6,10 +6,8 @@ from controller.controller import Controller
 
 if __name__ == '__main__':
     ip = 'localhost'
+    db = 'Pronondb'
     user = 'gabriel'
     pswd = 'olescki'
-    db = 'Pronondb'
 
-    m = Model(ip, user, pswd, db)
-    c = Controller(m)
-    c.run()
+    c = Controller(ip, db)

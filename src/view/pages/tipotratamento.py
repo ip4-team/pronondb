@@ -5,7 +5,7 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from functools import partial
 
-from .templates import *
+from ..templates import Menu
 
 
 class TipoTratamento(tk.Frame):

@@ -1,6 +1,6 @@
 import pymysql
 import warnings
-    
+
 
 class Model:
 

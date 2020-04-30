@@ -4,24 +4,54 @@ import tkinter.ttk as ttk
 
 from tkinter import LEFT, TOP, X, FLAT, RAISED
 from functools import partial
-from .paciente import Paciente
-from .coleta import Coleta
-from .diagnostico import Diagnostico
-from .amostrarna import AmostraRNA
-from .teste import Teste
-from .internamento import Internamento
-from .infoclinica import InfoClinica
-from .infomicrobiologica import InfoMicroBiologica
-from .obito import Obito
-from .medicamento import Medicamento
-from .tipotratamento import TipoTratamento
+
+from .pages import *
 
 
 class Main(tk.Frame):
     def __init__(self, parent, controller):
+        self.controller = controller
+        self.parent = parent
+        self.user = ''
+        self.pswd = ''
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Main Page", font=('Arial', 12))
         label.pack()
+
+        self.hide_menubar()
+
+        parent.focus_set()
+        parent.bind('<Alt_L>', self.toggle_menubar)
+
+    def show_about(self):
+        print("Prodigialis")
+
+    def toggle_menubar(self, e):
+        if self.menubar_isopen:
+            self.hide_menubar()
+        else:
+            self.show_menubar()
+
+    def hide_menubar(self):
+        self.menubar_isopen = False
+
+        menubar = tk.Menu(self.controller)
+        self.controller.config(menu=menubar)
+
+    def show_menubar(self):
+        self.menubar_isopen = True
+
+        menubar = tk.Menu(self.controller)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_separator()
+        filemenu.add_command(label="Sair", command=self.controller.quit)
+        menubar.add_cascade(label="Arquivo", menu=filemenu)
+
+        helpmenu = tk.Menu(menubar, tearoff=0)
+        helpmenu.add_command(label="Sobre", command=self.show_about)
+        menubar.add_cascade(label="Ajuda", menu=helpmenu)
+
+        self.controller.config(menu=menubar)
 
 
 class Navbar(tk.Frame):
@@ -47,6 +77,10 @@ class Navbar(tk.Frame):
         teste_button = ttk.Button(self, text="Teste",
                            command=lambda: controller.show_frame('Teste'))
         teste_button.pack(fill='x')
+
+        rnaseq_button = ttk.Button(self, text="RNASeq",
+                           command=lambda: controller.show_frame('RNASeq'))
+        rnaseq_button.pack(fill='x')
 
         internamento_button = ttk.Button(self, text="Internamento",
                            command=lambda: controller.show_frame('Internamento'))

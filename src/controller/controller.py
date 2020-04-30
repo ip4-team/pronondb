@@ -10,9 +10,7 @@ from view.view import *
 
 
 class Controller(tk.Tk):
-    def __init__(self, model):
-        self.model = model
-
+    def __init__(self, ip, db):
         tk.Tk.__init__(self)
         self.container = tk.Frame(self)
 
@@ -30,6 +28,9 @@ class Controller(tk.Tk):
         self.main.grid_rowconfigure(0, weight=1)
         self.main.grid_columnconfigure(0, weight=1)
 
+        # TODO:  <30-04-20, make inputs for user and pswd> #
+        self.model = Model(ip, user, pswd, db)
+        self.run()
 
     def run(self):
         self.title("Pronon DB test")
@@ -38,6 +39,7 @@ class Controller(tk.Tk):
         style.theme_use('clam')
         self.deiconify()
         self.mainloop()
+
 
     def show_frame(self, page_name):
         self.main.destroy()

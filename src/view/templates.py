@@ -50,6 +50,7 @@ class Menu():
         remove_button.pack(pady=5)
 
     def select_id(self, slave):
+        self.modal_isopen = True
         self.ids = self.get_rows(self.table_name)
 
         x = self.parent.winfo_x()
@@ -77,21 +78,20 @@ class Menu():
             self.modal, text="Enviar", command=partial(self.raise_slave, slave))
         send_button.pack(side=tk.RIGHT, padx=5, pady=15)
 
-        self.modal_isopen = True
 
     def raise_slave(self, slave):
         if self.modal_isopen:
+            self.modal_isopen = False
             slave.set_id(self.modal_entry.get())
             self.modal.destroy()
-            self.modal_isopen = False
 
         self.form.back_button.config(command=slave.exit)
         self.form.query_button.config(command=slave.callback)
         self.form_frame.lift()
 
     def destroy_modal(self):
-        self.modal.destroy()
         self.modal_isopen = False
+        self.modal.destroy()
 
     def raise_parent(self):
         self.buttonframe.lift()

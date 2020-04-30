@@ -5,31 +5,27 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from functools import partial
 
-from .templates import *
+from ..templates import *
 
 
-class Medicamento(tk.Frame):
+class Internamento(tk.Frame):
     def __init__(self, parent, controller):
         self.controller = controller
         tk.Frame.__init__(self, parent)
         self.table_name = self.__class__.__name__
 
         paciente_values = controller.get_rows_ids('Paciente')
-        tipotratamento_values = controller.get_rows_ids('TipoTratamento')
 
         fields = {
             'idPaciente':   {'label': 'Paciente',
                              'entry': ttk.Combobox,
                              'value': paciente_values},
-            'idTipoTratamento':   {'label': 'Tipo de Tratamento',
-                                   'entry': ttk.Combobox,
-                                   'value': tipotratamento_values},
-            'Nome':        {'label': 'Nome do medicamento',
+            'DataEntrada':  {'label': 'Data de Entrada (dd/mm/aaaa)',
+                             'entry': DateEntry},
+            'DiaAlta':      {'label': 'Data de Alta',
+                             'entry': DateEntry},
+            'Motivo':       {'label': 'Motivo',
                              'entry': ttk.Entry},
-            'DataInicio':   {'label': 'Data de inicio (dd/mm/aaaa)',
-                             'entry': DateEntry},
-            'DataTermino':  {'label': 'Data de termino',
-                             'entry': DateEntry},
         }
 
         main_page = Menu(self, controller, self.table_name, fields)

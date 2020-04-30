@@ -6,14 +6,15 @@ from tkcalendar import Calendar, DateEntry
 from functools import partial
 from datetime import datetime
 
-from .templates import *
+from ..templates import *
 
 
 class Paciente(tk.Frame):
     def __init__(self, parent, controller):
         self.controller = controller
         tk.Frame.__init__(self, parent)
-        self.table_name = 'Paciente'
+        self.table_name = self.__class__.__name__
+
         fields = {
             'HospitalOrigem':   {'label': 'Hospital de Origem',
                                  'entry': ttk.Entry},

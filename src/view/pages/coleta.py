@@ -5,14 +5,14 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from functools import partial
 
-from .templates import *
+from ..templates import *
 
 
-class Internamento(tk.Frame):
+class Coleta(tk.Frame):
     def __init__(self, parent, controller):
         self.controller = controller
         tk.Frame.__init__(self, parent)
-        self.table_name = 'Internamento'
+        self.table_name = self.__class__.__name__
 
         paciente_values = controller.get_rows_ids('Paciente')
 
@@ -20,12 +20,12 @@ class Internamento(tk.Frame):
             'idPaciente':   {'label': 'Paciente',
                              'entry': ttk.Combobox,
                              'value': paciente_values},
-            'DataEntrada':  {'label': 'Data de Entrada (dd/mm/aaaa)',
+            'Data':         {'label': 'Data da coleta (dd/mm/aaaa)',
                              'entry': DateEntry},
-            'DiaAlta':      {'label': 'Data de Alta',
+            'DiaTratamento':{'label': 'Dia do tratamento',
                              'entry': DateEntry},
-            'Motivo':       {'label': 'Motivo',
-                             'entry': ttk.Entry},
+            'MaterialColetado': {'label': 'Material coletado',
+                             'entry': ttk.Entry}
         }
 
         main_page = Menu(self, controller, self.table_name, fields)
