@@ -103,7 +103,6 @@ class Model:
 
         return result, code, message
 
-
     def delete(self, sql_query):
         con = pymysql.connect(host=self.ip,
                               user=self.user,
@@ -132,5 +131,29 @@ class Model:
             result = 2
         finally:
             con.close()
+
+        return result, code, message
+
+    def con_check(self):
+        result = 0
+        code, message = '', ''
+
+        try:
+            con = pymysql.connect(host=self.ip,
+                                  user=self.user,
+                                  password=self.pswd,
+                                  db=self.db)
+        except Warning as warning:
+            code, message = warning.args
+            result = 1
+        except pymysql.InternalError as error:
+            code, message = error.args
+            result = 2
+        except pymysql.IntegrityError as error:
+            code, message = error.args
+            result = 2
+        except pymysql.OperationalError as error:
+            code, message = error.args
+            result = 2
 
         return result, code, message

@@ -8,6 +8,39 @@ from functools import partial
 from .pages import *
 
 
+class Dialog:
+    def __init__(self, parent):
+        self.parent = parent
+
+        x = parent.winfo_x()
+        y = parent.winfo_y()
+
+        self.top = tk.Toplevel(parent)
+        self.top.title("MySQL")
+        self.top.geometry('+%d+%d' % (x + 200, y + 200))
+        self.top.transient(parent)
+        self.top.grab_set()
+        self.top.deiconify()
+
+        self.user_var = tk.StringVar(value='')
+        user_label = ttk.Label(self.top, text="Usuário: ").pack()
+        user_entry = tk.Entry(self.top, textvariable=self.user_var)
+        user_entry.pack(padx=5)
+
+        self.pswd_var = tk.StringVar(value='')
+        pswd_label = ttk.Label(self.top, text="Senha: ").pack()
+        pswd = tk.Entry(self.top, textvariable=self.pswd_var)
+        pswd.pack(padx=5)
+
+        enviar_button = ttk.Button(self.top, text="Enviar", command=self.top.destroy)
+        enviar_button.pack(pady=5, padx=5)
+
+    def show(self):
+        self.top.focus_force()
+        self.parent.wait_window(self.top)
+        return self.user_var.get(), self.pswd_var.get()
+
+
 class Main(tk.Frame):
     def __init__(self, parent, controller):
         self.controller = controller
@@ -24,7 +57,7 @@ class Main(tk.Frame):
         parent.bind('<Alt_L>', self.toggle_menubar)
 
     def show_about(self):
-        print("Prodigialis")
+        pass
 
     def toggle_menubar(self, e):
         if self.menubar_isopen:

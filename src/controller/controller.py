@@ -11,7 +11,40 @@ from view.view import *
 
 class Controller(tk.Tk):
     def __init__(self, ip, db):
+        self.ip = ip
+        self.db = db
         tk.Tk.__init__(self)
+
+        self.title("Pronon DB test")
+        self.geometry('800x600')
+        style = ttk.Style(self)
+        style.theme_use('clam')
+
+        self.make_layout()
+
+        self.check_credentials()
+
+        self.mainloop()
+
+    def check_credentials(self):
+        credentials_modal = Dialog(self)
+        user, pswd = credentials_modal.show()
+
+        if user == '' and pswd == '':
+            self.handler(2, 1, "Erro: Usuário e senha não podem ser vazios")
+            self.destroy()
+            return
+
+        self.model = Model(self.ip, user, pswd, self.db)
+        result, code, message = self.model.con_check()
+        if result:
+            self.handler(result, code, message)
+            self.destroy()
+            return
+        else:
+            tk.messagebox.showinfo("Sucesso!", "Conexão com o banco de dados foi um sucesso!")
+
+    def make_layout(self):
         self.container = tk.Frame(self)
 
         self.container.pack(side='top', fill='both', expand=True)
@@ -27,19 +60,6 @@ class Controller(tk.Tk):
         self.main.pack(side='right', fill='both', expand=True)
         self.main.grid_rowconfigure(0, weight=1)
         self.main.grid_columnconfigure(0, weight=1)
-
-        # TODO:  <30-04-20, make inputs for user and pswd> #
-        self.model = Model(ip, user, pswd, db)
-        self.run()
-
-    def run(self):
-        self.title("Pronon DB test")
-        self.geometry('800x600')
-        style = ttk.Style(self)
-        style.theme_use('clam')
-        self.deiconify()
-        self.mainloop()
-
 
     def show_frame(self, page_name):
         self.main.destroy()
@@ -98,9 +118,7 @@ class Controller(tk.Tk):
                 title="Mysql Erro", message=str(code)+': '+message)
 
     def get_rows_ids(self, table):
-        table_values = self.send_query('SELECT',
-                                                  table,
-                                                  '*')
+        table_values = self.send_query('SELECT', table, '*')
         ids = [x['id'+table] for x in table_values[2]]
 
         return ids

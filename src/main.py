@@ -7,7 +7,7 @@ from controller.controller import Controller
 if __name__ == '__main__':
     ip = 'localhost'
     db = 'Pronondb'
-    user = 'gabriel'
-    pswd = 'olescki'
+    #  user = 'gabriel'
+    #  pswd = 'olescki'
 
     c = Controller(ip, db)
