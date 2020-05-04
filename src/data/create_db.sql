@@ -228,9 +228,9 @@ CREATE TABLE TipoTratamento (
 DROP TABLE IF EXISTS LogPreenchimento;
 CREATE TABLE LogPreenchimento (
     idLogPreenchimento INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    idPaciente INT UNSIGNED NOT NULL,
-    TipoEntrada CHAR(255) NOT NULL,
-    Data DATE NOT NULL,
-    Nome CHAR(255) NOT NULL,
-    FOREIGN KEY (idPaciente) REFERENCES Paciente (idPaciente)
+    Comando CHAR(255) NOT NULL,
+    Query CHAR(255) NOT NULL,
+    Tabela CHAR(255) NOT NULL,
+    Data DATETIME NOT NULL,
+    Nome CHAR(255) NOT NULL
 ) ENGINE=InnoDB;

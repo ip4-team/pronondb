@@ -27,8 +27,11 @@ class Controller(tk.Tk):
         self.mainloop()
 
     def check_credentials(self):
-        credentials_modal = Dialog(self)
-        user, pswd = credentials_modal.show()
+        # TODO:  <04-05-20> Change this when deploy! #
+        #  credentials_modal = Dialog(self)
+        #  user, pswd = credentials_modal.show()
+        user = 'gabriel'
+        pswd = 'olescki'
 
         if user == '' and pswd == '':
             self.handler(2, 1, "Erro: Usuário e senha não podem ser vazios")
@@ -43,6 +46,9 @@ class Controller(tk.Tk):
             return
         else:
             tk.messagebox.showinfo("Sucesso!", "Conexão com o banco de dados foi um sucesso!")
+
+        self.user = user
+        self.pswd = pswd
 
     def make_layout(self):
         self.container = tk.Frame(self)
@@ -106,7 +112,25 @@ class Controller(tk.Tk):
 
             return_value = self.model.delete(message)
 
+        if command != 'SELECT':
+            self.insert_log(command, message, query_values, table)
+
         return return_value
+
+    def insert_log(self, command, query, query_values, table):
+        query = query.replace('%s, ', '')
+        splitted_query = query.split(' ')
+        splitted_query[-1] = query_values
+        final_query = str(splitted_query)
+
+        time = datetime.datetime.now()
+        time_str = time.strftime('%Y-%d-%m %H:%M:%S')
+
+        message = 'INSERT into LogPreenchimento (Comando, Query, Tabela, Data, Nome) VALUES (%s, %s, %s, %s, %s)'
+        log_values = (command, final_query, table, time_str, self.user)
+        print(log_values)
+        return_value = self.model.insert(message, log_values)
+        print(return_value)
 
     def handler(self, error_type, code, message):
         if error_type == 1:

@@ -29,7 +29,7 @@ class Dialog:
 
         self.pswd_var = tk.StringVar(value='')
         pswd_label = ttk.Label(self.top, text="Senha: ").pack()
-        pswd = tk.Entry(self.top, textvariable=self.pswd_var)
+        pswd = tk.Entry(self.top, textvariable=self.pswd_var, show='*')
         pswd.pack(padx=5)
 
         enviar_button = ttk.Button(self.top, text="Enviar", command=self.top.destroy)
