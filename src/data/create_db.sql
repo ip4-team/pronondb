@@ -204,7 +204,7 @@ DROP TABLE IF EXISTS Medicamento;
 CREATE TABLE Medicamento (
     idMedicamento INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     idPaciente INT UNSIGNED NOT NULL,
-    idTipoTratamento INT UNSIGNED NOT NULL,
+    TipoTratamento CHAR(255) NOT NULL,
     Nome CHAR(255) NOT NULL,
     DataInicio DATE NOT NULL,
     DataTermino DATE NOT NULL,

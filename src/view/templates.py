@@ -33,9 +33,9 @@ class Menu():
         self.update = Update(self, parent, controller, self.entries)
         self.delete = Delete(self, parent, controller, self.entries)
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.buttonframe.lift()
         register_button = ttk.Button(self.buttonframe, text="Cadastrar " + self.table_name,
                                      command=partial(self.raise_slave, self.register), width=30)
@@ -51,7 +51,7 @@ class Menu():
 
     def select_id(self, slave):
         self.modal_isopen = True
-        self.ids = self.get_rows(self.table_name)
+        self.ids = self.controller.get_rows_ids(self.table_name)
 
         x = self.parent.winfo_x()
         y = self.parent.winfo_y()
@@ -97,14 +97,6 @@ class Menu():
 
     def raise_parent(self):
         self.buttonframe.lift()
-
-    def get_rows(self, table):
-        table_values = self.controller.send_query('SELECT',
-                                                  table,
-                                                  '*')
-        ids = [x['id'+table] for x in table_values[2]]
-
-        return ids
 
 
 class Form():

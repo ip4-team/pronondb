@@ -11,4 +11,6 @@ from .rnaseq import RNASeq
 from .teste import Teste
 from .tipotratamento import TipoTratamento
 
+from .exportar import Exportar
+
 #  __all__ = ['coleta', 'diagnostico', 'teste', 'paciente', 'infoclinica', 'tipotratamento', 'amostrarna', 'internamento', 'rnaseq', 'obito', 'medicamento', 'infomicrobiologica']

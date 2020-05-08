@@ -70,7 +70,7 @@ class Model:
         finally:
             con.close()
 
-        return result, code, message
+        return result, code, message, cursor
 
     def update(self, sql_query, data):
         con = pymysql.connect(host=self.ip,

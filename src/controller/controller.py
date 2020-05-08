@@ -1,9 +1,11 @@
 import re
 import datetime
-
+import csv
 import tkinter as tk
+
 from tkinter import ttk
 from tkinter.ttk import Progressbar
+from pathlib import Path
 
 from model.model import Model
 from view.view import *
@@ -27,11 +29,8 @@ class Controller(tk.Tk):
         self.mainloop()
 
     def check_credentials(self):
-        # TODO:  <04-05-20> Change this when deploy! #
-        #  credentials_modal = Dialog(self)
-        #  user, pswd = credentials_modal.show()
-        user = 'gabriel'
-        pswd = 'olescki'
+        credentials_modal = Dialog(self)
+        user, pswd = credentials_modal.show()
 
         if user == '' and pswd == '':
             self.handler(2, 1, "Erro: Usuário e senha não podem ser vazios")
@@ -151,4 +150,35 @@ class Controller(tk.Tk):
         ids = [x['id'+table] for x in table_values[2]]
 
         return ids
+
+    def get_rows(self, table):
+        return self.send_query('SELECT', table, '*')
+
+    def export_data(self, table):
+        table_values = self.get_rows(table)
+        rows = table_values[2]
+        cursor = table_values[3]
+
+        file_path = Path.cwd()
+        base_path = file_path.parent
+        tmp_path = base_path / 'tmp/'
+        csv_filename = table + '.csv'
+        csv_file_path = tmp_path / csv_filename
+
+        result = []
+        column_names = []
+
+        for i in cursor.description:
+            column_names.append(i[0])
+
+        result.append(column_names)
+        for row in rows:
+            result.append(row.values())
+
+        # Write result to file.
+        with open(csv_file_path, 'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for r in result:
+                #  print(r)
+                csvwriter.writerow(r)
 

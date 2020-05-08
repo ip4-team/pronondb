@@ -141,6 +141,13 @@ class Navbar(tk.Frame):
                            command=lambda: controller.show_frame('TipoTratamento'))
         tipotratamento_button.pack(fill='x')
 
+        separator = ttk.Separator(self)
+        separator.pack(fill='x', pady=10)
+
+        exportar_button = ttk.Button(self, text="Exportar Dados",
+                           command=lambda: controller.show_frame('Exportar'))
+        exportar_button.pack(fill='x')
+
 
 class Toolbar(tk.Frame):
     def __init__(self, parent, controller):
