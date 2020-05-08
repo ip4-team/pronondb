@@ -54,7 +54,7 @@ class Controller(tk.Tk):
         self.container = tk.Frame(self)
 
         self.container.pack(side='top', fill='both', expand=True)
-        #  self.statusbar = Statusbar(container, self)
+        self.menu = Menu(self.container, self)
         self.toolbar = Toolbar(self.container, self)
         self.navbar = Navbar(self.container, self)
         self.main = Main(self.container, self)
@@ -66,6 +66,9 @@ class Controller(tk.Tk):
         self.main.pack(side='right', fill='both', expand=True)
         self.main.grid_rowconfigure(0, weight=1)
         self.main.grid_columnconfigure(0, weight=1)
+
+        self.container.focus_set()
+        self.bind('<Alt_L>', self.menu.toggle_menubar)
 
     def show_frame(self, page_name):
         self.main.destroy()
@@ -120,17 +123,19 @@ class Controller(tk.Tk):
     def insert_log(self, command, query, query_values, table):
         query = query.replace('%s, ', '')
         splitted_query = query.split(' ')
-        splitted_query[-1] = query_values
-        final_query = str(splitted_query)
+        if command == 'INSERT':
+            index = -1
+        if command == 'UPDATE' or command == 'DELETE':
+            index = -3
+        splitted_query[index] = str(query_values).strip('[]')
+        final_query = ' '.join(map(str, splitted_query))
 
         time = datetime.datetime.now()
         time_str = time.strftime('%Y-%d-%m %H:%M:%S')
 
         message = 'INSERT into LogPreenchimento (Comando, Query, Tabela, Data, Nome) VALUES (%s, %s, %s, %s, %s)'
         log_values = (command, final_query, table, time_str, self.user)
-        print(log_values)
         return_value = self.model.insert(message, log_values)
-        print(return_value)
 
     def handler(self, error_type, code, message):
         if error_type == 1:

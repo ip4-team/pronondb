@@ -51,10 +51,12 @@ class Main(tk.Frame):
         label = ttk.Label(self, text="Main Page", font=('Arial', 12))
         label.pack()
 
-        self.hide_menubar()
 
-        parent.focus_set()
-        parent.bind('<Alt_L>', self.toggle_menubar)
+class Menu():
+    def __init__(self, parent, controller):
+        self.parent = parent
+        self.controller = controller
+        self.hide_menubar()
 
     def show_about(self):
         pass

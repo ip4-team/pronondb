@@ -78,12 +78,14 @@ class Menu():
             self.modal, text="Enviar", command=partial(self.raise_slave, slave))
         send_button.pack(side=tk.RIGHT, padx=5, pady=15)
 
-
     def raise_slave(self, slave):
         if self.modal_isopen:
             self.modal_isopen = False
             slave.set_id(self.modal_entry.get())
             self.modal.destroy()
+
+        if slave.__class__.__name__ == 'Delete':
+            self.form.disable_form()
 
         self.form.back_button.config(command=slave.exit)
         self.form.query_button.config(command=slave.callback)
@@ -110,15 +112,19 @@ class Form():
         self.parent = parent
         self.fields = fields
         self.disable = disable
+        self.entries = []
+        # Code so that the scrollbar works
         canvas = tk.Canvas(parent, highlightthickness=0)
-        scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
+        scrollbar = ttk.Scrollbar(
+            parent, orient="vertical", command=canvas.yview)
 
         self.frame = ttk.Frame(canvas)
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.bind("<Configure>",
                         lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
-        canvas.fram_n_canvas_iid = canvas.create_window((0, 0), window=self.frame, anchor='nw')
+        canvas.fram_n_canvas_iid = canvas.create_window(
+            (0, 0), window=self.frame, anchor='nw')
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side=tk.LEFT, fill='both', expand=True)
         scrollbar.pack(side=tk.RIGHT, fill='y')
@@ -126,31 +132,19 @@ class Form():
         canvas.bind("<Configure>", self.canvas_configure)
 
         self.back_button = ttk.Button(self.frame, text="Voltar")
-        if disable:
-            query_button_label = "Deletar"
-        else:
-            query_button_label = "Salvar"
+        query_button_label = "Salvar"
         self.query_button = ttk.Button(self.frame, text=query_button_label)
 
     def canvas_configure(self, event):
         canvas = event.widget
-        canvas.itemconfigure(canvas.fram_n_canvas_iid, width=canvas.winfo_width())
+        canvas.itemconfigure(canvas.fram_n_canvas_iid,
+                             width=canvas.winfo_width())
 
     def make_form(self):
-        style = ttk.Style()
-        if self.disable:
-            style.map('TEntry',
-                      foreground=[('disabled', 'black')])
-            style.map('TRadiobutton',
-                      foreground=[('disabled', 'black')])
+        entry_state = 'normal'
+        combobox_state = 'readonly'
 
-            entry_state = 'disabled'
-            combobox_state = 'disabled'
-        else:
-            entry_state = 'normal'
-            combobox_state = 'readonly'
-
-        entries = []
+        entries_val = []
         for key in self.fields:
             label_text = self.fields[key]['label']
             entry = self.fields[key]['entry']
@@ -190,11 +184,25 @@ class Form():
                 ent = entry(row, textvariable=ent_var, state=entry_state)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
 
-            entries.append((key, ent_var, entry))
+            entries_val.append((key, ent_var, entry))
+            self.entries.append(ent)
         # Send Query button
         self.back_button.pack(side=tk.LEFT, padx=5, pady=50)
         self.query_button.pack(side=tk.RIGHT, padx=5, pady=50)
-        return entries
+        return entries_val
+
+    def disable_form(self):
+        style = ttk.Style()
+        style.map('TEntry',
+                  foreground=[('disabled', 'black')])
+        style.map('TRadiobutton',
+                  foreground=[('disabled', 'black')])
+        entry_state = 'disabled'
+        combobox_state = 'disabled'
+        self.query_button.config(text='Deletar')
+
+        for e in self.entries:
+            e.config(state=entry_state)
 
 
 class Register():
@@ -252,6 +260,7 @@ class Register():
 
     def set_id(self):
         pass
+
 
 class Update():
     def __init__(self, menu, parent, controller, entries):
