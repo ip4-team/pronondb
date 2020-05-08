@@ -67,7 +67,7 @@ class Controller(tk.Tk):
         self.main.grid_columnconfigure(0, weight=1)
 
         self.container.focus_set()
-        self.bind('<Alt_L>', self.menu.toggle_menubar)
+        self.bind('<KeyRelease-Alt_L>', self.menu.toggle_menubar)
 
     def show_frame(self, page_name):
         self.main.destroy()

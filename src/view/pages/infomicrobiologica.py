@@ -15,12 +15,12 @@ class InfoMicroBiologica(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.table_name = self.__class__.__name__
 
-        coleta_values = controller.get_rows_ids('Coleta')
+        paciente_values = controller.get_rows_ids('Paciente')
 
         fields = {
-            'idPaciente':   {'label': 'Coleta',
+            'idPaciente':   {'label': 'Paciente',
                              'entry': ttk.Combobox,
-                             'value': coleta_values},
+                             'value': paciente_values},
             'DataCultura': {'label': 'Data da cultura',
                                 'entry': DateEntry},
             'Microrganismo': {'label': 'Microorganismo identificado',

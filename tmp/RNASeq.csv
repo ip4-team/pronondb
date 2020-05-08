@@ -1,1 +1,1 @@
-idRNASeq,idPaciente,idAmostra,Metodo,DataPreparo,DataCorrida,Barcode,NomeRegistroIon,Qualidade
+idRNASeq,idPaciente,idAmostraRNA,Metodo,DataPreparo,DataCorrida,Barcode,NomeRegistroIon,Qualidade

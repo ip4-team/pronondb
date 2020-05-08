@@ -80,12 +80,18 @@ class Menu():
 
     def raise_slave(self, slave):
         if self.modal_isopen:
+            selected_id = self.modal_entry.get()
+            if not selected_id:
+                return
+
             self.modal_isopen = False
-            slave.set_id(self.modal_entry.get())
+            slave.set_id(selected_id)
             self.modal.destroy()
 
         if slave.__class__.__name__ == 'Delete':
             self.form.disable_form()
+        else:
+            self.form.enable_form()
 
         self.form.back_button.config(command=slave.exit)
         self.form.query_button.config(command=slave.callback)
@@ -156,28 +162,33 @@ class Form():
                     ent = entry(row, text=v[0], value=v[1], variable=ent_var,
                                 state=entry_state)
                     ent.pack(side=tk.LEFT, padx=15)
+                    self.entries.append(ent)
             # Combobox
             elif entry == ttk.Combobox:
                 ent = entry(row, state=combobox_state,
                             values=self.fields[key]['value'], textvariable=ent_var)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
+                self.entries.append(ent)
             # Date picker
             elif entry == DateEntry:
                 ent = entry(row, date_pattern='dd/mm/yyyy',
                             textvariable=ent_var, state=entry_state)
                 ent.delete(0, "end")
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
+                self.entries.append(ent)
             # Text box
             elif entry == ScrolledText:
                 ent_var = entry(row, wrap=tk.WORD, width=20, height=10)
                 ent_var.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
+                ent = ent_var
+                self.entries.append(ent)
             # Other entries
             else:
                 ent = entry(row, textvariable=ent_var, state=entry_state)
                 ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X, padx=15)
+                self.entries.append(ent)
 
             entries_val.append((key, ent_var, entry))
-            self.entries.append(ent)
         # Send Query button
         self.back_button.pack(side=tk.LEFT, padx=5, pady=50)
         self.query_button.pack(side=tk.RIGHT, padx=5, pady=50)
@@ -195,6 +206,20 @@ class Form():
 
         for e in self.entries:
             e.config(state=entry_state)
+
+    def enable_form(self):
+        style = ttk.Style()
+        style.map('TCombobox',
+                  fieldbackground=[('readonly', 'white')])
+        entry_state = 'normal'
+        combobox_state = 'readonly'
+        self.query_button.config(text='Enviar')
+
+        for e in self.entries:
+            if e.__class__.__name__ == 'Combobox':
+                e.config(state=combobox_state)
+            else:
+                e.config(state=entry_state)
 
 
 class Register():
@@ -361,13 +386,13 @@ class Update():
 
     def set_id(self, input_id):
         self.selected_id = input_id
-        code, message, selected_row = self.controller.send_query('SELECT',
-                                                                 self.parent.table_name,
-                                                                 '*',
-                                                                 where='id'+self.parent.table_name,
-                                                                 where_values=self.selected_id)
+        result = self.controller.send_query('SELECT',
+                                            self.parent.table_name,
+                                            '*',
+                                            where='id'+self.parent.table_name,
+                                            where_values=self.selected_id)
 
-        self.row = selected_row[0]
+        self.row = result[2][0]
         self.update_form()
 
 
@@ -394,7 +419,6 @@ class Delete():
 
             if entry[2] == ScrolledText:
                 text = entry[1].insert('1.0', value)
-                entry[1].config(state='disabled')
             else:
                 entry[1].set(value)
 
@@ -434,11 +458,11 @@ class Delete():
     def set_id(self, input_id):
         self.selected_id = input_id
 
-        code, message, selected_row = self.controller.send_query('SELECT',
-                                                                 self.parent.table_name,
-                                                                 '*',
-                                                                 where='id'+self.parent.table_name,
-                                                                 where_values=self.selected_id)
+        result = self.controller.send_query('SELECT',
+                                            self.parent.table_name,
+                                            '*',
+                                            where='id'+self.parent.table_name,
+                                            where_values=self.selected_id)
 
-        self.row = selected_row[0]
+        self.row = result[2][0]
         self.update_form()

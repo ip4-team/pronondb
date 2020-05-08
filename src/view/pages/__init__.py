@@ -9,7 +9,6 @@ from .obito import Obito
 from .paciente import Paciente
 from .rnaseq import RNASeq
 from .teste import Teste
-from .tipotratamento import TipoTratamento
 
 from .exportar import Exportar
 

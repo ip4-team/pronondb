@@ -113,7 +113,7 @@ DROP TABLE IF EXISTS RNASeq;
 CREATE TABLE RNASeq (
     idRNASeq INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     idPaciente INT UNSIGNED NOT NULL,
-    idAmostra INT UNSIGNED NOT NULL,
+    idAmostraRNA INT UNSIGNED NOT NULL,
     Metodo ENUM('Transcriptoma total', 'Ampliseq', 'SMART3seq') NOT NULL,
     DataPreparo DATE NOT NULL,
     DataCorrida DATE NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE RNASeq (
     NomeRegistroIon CHAR(255) NOT NULL,
     Qualidade CHAR(255) NOT NULL,
     FOREIGN KEY (idPaciente) REFERENCES Paciente (idPaciente),
-    FOREIGN KEY (idAmostra) REFERENCES Amostra (idAmostra)
+    FOREIGN KEY (idAmostraRNA) REFERENCES AmostraRNA (idAmostraRNA)
 ) ENGINE=InnoDB;
 
 ---------------------------------------------------------------

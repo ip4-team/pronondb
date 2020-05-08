@@ -137,10 +137,6 @@ class Navbar(tk.Frame):
                            command=lambda: controller.show_frame('Medicamento'))
         medicamento_button.pack(fill='x')
 
-        tipotratamento_button = ttk.Button(self, text="Tipo Tratamento",
-                           command=lambda: controller.show_frame('TipoTratamento'))
-        tipotratamento_button.pack(fill='x')
-
         separator = ttk.Separator(self)
         separator.pack(fill='x', pady=10)
 

@@ -1,1 +1,1 @@
-idMedicamento,idPaciente,idTipoTratamento,Nome,DataInicio,DataTermino
+idMedicamento,idPaciente,TipoTratamento,Nome,DataInicio,DataTermino

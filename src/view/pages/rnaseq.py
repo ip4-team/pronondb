@@ -15,13 +15,13 @@ class RNASeq(tk.Frame):
         self.table_name = self.__class__.__name__
 
         paciente_values = controller.get_rows_ids('Paciente')
-        amostra_values = controller.get_rows_ids('Amostra')
+        amostra_values = controller.get_rows_ids('AmostraRNA')
 
         fields = {
             'idPaciente':   {'label': 'Pacientes',
                              'entry': ttk.Combobox,
                              'value': paciente_values},
-            'idAmostra':    {'label': 'Amostras',
+            'idAmostraRNA':    {'label': 'Amostras',
                              'entry': ttk.Combobox,
                              'value': amostra_values},
             'Metodo':       {'label': 'Metodo utilizado',
