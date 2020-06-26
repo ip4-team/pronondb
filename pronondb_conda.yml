@@ -1,0 +1,13 @@
+name: pronondb
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pymysql
+  - pyinstaller
+  - pip
+  - pip:
+    - tkcalendar
+prefix: /home/gabriel/miniconda3/envs/pronondb
+
