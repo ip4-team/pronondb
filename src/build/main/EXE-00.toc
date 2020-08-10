@@ -46,7 +46,7 @@
  [],
  False,
  False,
- 1593173590,
+ 1597069538,
  [('run',
    '/home/gabriel/miniconda3/envs/pronondb/lib/python3.8/site-packages/PyInstaller/bootloader/Linux-64bit/run',
    'EXECUTABLE')])
