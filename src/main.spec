@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['/home/gabriel/Projects/pronondb/src'],
+             pathex=['C:\\Users\\User\\Documents\\GitHub\\pronondb\\src'],
              binaries=[],
              datas=[],
              hiddenimports=['babel.numbers'],
